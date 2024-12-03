@@ -11,6 +11,7 @@ target_sources(
                 main.cpp
 
                 solutions/2024/src/day_one.cpp
+                solutions/2024/src/day_two.cpp
                 solutions/2024/src/advent_day.cpp
 )
 

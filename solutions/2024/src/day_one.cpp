@@ -31,5 +31,5 @@ long day_one::part_one() {
 long day_one::part_two() {
     return std::ranges::fold_left(m_left, 0, [this] (int acc, int value) {
         return acc + (value * std::ranges::count(m_right, value));
-    });;
+    });
 }
