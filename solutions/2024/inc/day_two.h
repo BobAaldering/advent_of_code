@@ -11,8 +11,8 @@ class day_two : public advent_day {
 public:
     explicit day_two(const std::string& file_input_name);
 
-    long part_one() override;
-    long part_two() override;
+    auto part_one() -> long override;
+    auto part_two() -> long override;
 
 private:
     static auto _is_safe(const std::vector<int>& lines) -> bool;

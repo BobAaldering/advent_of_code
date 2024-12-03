@@ -10,8 +10,8 @@ class day_one : public advent_day {
 public:
     explicit day_one(const std::string& file_input_name);
 
-    long part_one() override;
-    long part_two() override;
+    auto part_one() -> long override;
+    auto part_two() -> long override;
 
 public:
     std::vector<int> m_left;

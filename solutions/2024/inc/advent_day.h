@@ -7,8 +7,8 @@ class advent_day {
 public:
     explicit advent_day(const std::string& file_input_name);
 
-    virtual long part_one() = 0;
-    virtual long part_two() = 0;
+    virtual auto part_one() -> long = 0;
+    virtual auto part_two() -> long = 0;
 
     virtual ~advent_day() = default;
 

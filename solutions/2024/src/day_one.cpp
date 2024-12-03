@@ -6,7 +6,7 @@ day_one::day_one(const std::string &file_input_name) :
     m_right {}
 {}
 
-long day_one::part_one() {
+auto day_one::part_one() -> long {
     auto parsed_file_content = std::views::istream<int>(m_input_file_stream)
                  | std::ranges::to<std::vector>();
 
@@ -28,7 +28,7 @@ long day_one::part_one() {
     });
 }
 
-long day_one::part_two() {
+auto day_one::part_two() -> long {
     return std::ranges::fold_left(m_left, 0, [this] (int acc, int value) {
         return acc + (value * std::ranges::count(m_right, value));
     });

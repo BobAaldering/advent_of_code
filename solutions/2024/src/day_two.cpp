@@ -5,7 +5,7 @@ day_two::day_two(const std::string &file_input_name) :
         m_reports {}
 {}
 
-long day_two::part_one() {
+auto day_two::part_one() -> long {
     std::string line {};
 
     while (std::getline(m_input_file_stream, line)) {
@@ -18,7 +18,7 @@ long day_two::part_one() {
     return std::ranges::count_if(m_reports, [] (const std::vector<int>& lines) { return _is_safe(lines); });
 }
 
-long day_two::part_two() {
+auto day_two::part_two() -> long {
     return std::ranges::count_if(m_reports, [] (const std::vector<int>& lines) {
         return std::ranges::any_of(std::views::iota(0U, lines.size()), [&lines] (int i) {
             std::vector<int> temp = lines;
