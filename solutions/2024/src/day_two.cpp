@@ -1,8 +1,8 @@
 #include "day_two.h"
 
 day_two::day_two(const std::string &file_input_name) :
-        advent_day(file_input_name),
-        m_reports {}
+    advent_day(file_input_name),
+    m_reports {}
 {}
 
 auto day_two::part_one() -> long {

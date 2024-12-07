@@ -1,10 +1,10 @@
 #include "day_three.h"
 
 day_three::day_three(const std::string &file_input_name) :
-        advent_day(file_input_name),
-        m_instructions_str {std::istreambuf_iterator<char>(m_input_file_stream), std::istreambuf_iterator<char>() },
-        m_instruction_regex { R"(mul\((\d+),(\d+)\)|do(n't)?\(\))" },
-        m_instructions {}
+    advent_day(file_input_name),
+    m_instructions_str { std::istreambuf_iterator<char>(m_input_file_stream), std::istreambuf_iterator<char>() },
+    m_instruction_regex { R"(mul\((\d+),(\d+)\)|do(n't)?\(\))" },
+    m_instructions {}
 {}
 
 auto day_three::part_one() -> long {

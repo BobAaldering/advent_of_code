@@ -13,6 +13,7 @@ target_sources(
                 solutions/2024/src/day_one.cpp
                 solutions/2024/src/day_two.cpp
                 solutions/2024/src/day_three.cpp
+                solutions/2024/src/day_four.cpp
                 solutions/2024/src/advent_day.cpp
 )
 
@@ -52,7 +53,7 @@ set(HAS_ASAN FALSE)
 
 if (USE_ASAN AND (${LIBASAN_RESULT} EQUAL 0) AND (NOT ${LIBASAN_PATH} STREQUAL ""))
         message(NOTICE "Address sanitizer ('libasan.so') found at '${LIBASAN_PATH}'")
-        set(USE_ASAN TRUE)
+        set(HAS_ASAN TRUE)
 endif ()
 
 if (HAS_ASAN AND USE_ASAN)
