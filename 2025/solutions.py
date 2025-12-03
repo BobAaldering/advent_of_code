@@ -41,7 +41,6 @@ def day_2(filename: str) -> tuple[int, int]:
     return part_1, part_2
 
 
-
 def day_3(filename: str) -> tuple[int, int]:
     joltage_banks = [[int(c) for c in line.strip()] for line in open(filename).read().splitlines()]
 
