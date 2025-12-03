@@ -18,18 +18,18 @@ def run_configuration(configuration: dict) -> None:
         for day in day_solvers:
             day_number = day.__name__.split("_")[1]
 
-            try:
-                init_time = time.process_time_ns()
-                part_1, part_2 = day(f"{year}/input/day_{day_number}.txt")
-                elapsed_ms = (time.process_time_ns() - init_time) / 1e6
+            # try:
+            init_time = time.process_time_ns()
+            part_1, part_2 = day(f"{year}/input/day_{day_number}.txt")
+            elapsed_ms = (time.process_time_ns() - init_time) / 1e6
 
-                print(f"\n  📅 Day {day_number}")
-                print(f"  ├── Part 1: {part_1}")
-                print(f"  ├── Part 2: {part_2}")
-                print(f"  └── Time:   {elapsed_ms:.3f} ms")
+            print(f"\n  📅 Day {day_number}")
+            print(f"  ├── Part 1: {part_1}")
+            print(f"  ├── Part 2: {part_2}")
+            print(f"  └── Time:   {elapsed_ms:.3f} ms")
 
-            except Exception as error:
-                print(f"  An error occurred when running day {day_number}: {error}")
+            # except Exception as error:
+            #     print(f"  An error occurred when running day {day_number}: {error}")
 
 
 if __name__ == '__main__':
