@@ -1,4 +1,4 @@
-from itertools import accumulate, pairwise
+from itertools import accumulate, pairwise, product
 
 
 def day_1(filename: str) -> tuple[int, int]:
@@ -57,3 +57,34 @@ def day_3(filename: str) -> tuple[int, int]:
     part_2 = sum(_max_joltage(bank, 12) for bank in joltage_banks)
 
     return part_1, part_2
+
+
+def day_4(filename: str) -> tuple[int, int]:
+    grid = open(filename).read().splitlines()
+    height, width = len(grid), len(grid[0])
+
+    neigh = [(dx, dy) for dx, dy in product((-1, 0, 1), repeat=2) if (dx, dy) != (0, 0)]
+    papers = {(x, y) for y in range(height) for x in range(width) if grid[y][x] == "@"}
+
+    def _neighbors(x, y):
+        return ((x + dx, y + dy) for dx, dy in neigh if 0 <= x + dx < width and 0 <= y + dy < height)
+
+    def _adjacent_count(position):
+        return sum(nb in papers for nb in _neighbors(*position))
+
+    def _removal_layers():
+        current = accessible
+        remaining = papers
+        while current:
+            yield current
+            remaining -= current
+
+            current = {p for p in remaining if _adjacent_count(p) < 4}
+
+    accessible = {p for p in papers if _adjacent_count(p) < 4}
+
+    part_1 = len(accessible)
+    part_2 = sum(len(layer) for layer in _removal_layers())
+
+    return part_1, part_2
+
