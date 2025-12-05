@@ -1,3 +1,4 @@
+import re
 from itertools import accumulate, pairwise, product
 
 
@@ -88,3 +89,21 @@ def day_4(filename: str) -> tuple[int, int]:
 
     return part_1, part_2
 
+
+def day_5(filename: str) -> tuple[int, int]:
+    ranges_text, index_text = open(filename).read().split("\n\n")
+    ranges = sorted((int(low), int(high) + 1) for low, high in re.findall(r'(\d+)-(\d+)', ranges_text))
+
+    merged = []
+
+    for start, end in ranges:
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+
+        else:
+            merged.append((start, end))
+
+    part_1 = sum(any(a <= int(i) <= b for a, b in ranges) for i in index_text.split())
+    part_2 = sum(b - a + 1 for a, b in merged)
+
+    return part_1, part_2
