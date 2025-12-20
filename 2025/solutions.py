@@ -1,5 +1,8 @@
+import operator
 import re
-from itertools import accumulate, pairwise, product
+from functools import reduce
+from itertools import accumulate, pairwise, product, groupby
+from collections import Counter
 
 
 def day_1(filename: str) -> tuple[int, int]:
@@ -107,3 +110,48 @@ def day_5(filename: str) -> tuple[int, int]:
     part_2 = sum(b - a + 1 for a, b in merged)
 
     return part_1, part_2
+
+
+def day_6(filename: str) -> tuple[int, int]:
+    grid = open(filename).read().splitlines()
+    columns = ["".join(c) for c in zip(*[l.ljust(max(map(len, grid))) for l in grid])]
+    problems = [list(g) for k, g in groupby(columns, key=lambda c: c[:-1].strip() == "") if not k]
+
+    part_1 = 0
+    part_2 = 0
+
+    for problem in problems:
+        operand = next(c[-1] for c in problem if c[-1] in "+*")
+
+        apply_operand = sum if operand == "+" else lambda numbers: reduce(operator.mul, numbers, 1)
+
+        part_1 += apply_operand([int(s) for r in ["".join(c[i] for c in problem) for i in range(len(grid) - 1)] if (s := r.strip())])
+
+        part_2 += apply_operand([int(n) for c in problem[::-1] if (n := c[:-1].replace(" ", ""))])
+
+    return part_1, part_2
+
+
+def day_7(filename: str) -> tuple[int, int]:
+    grid = open(filename).read().splitlines()
+    height, width = len(grid), len(grid[0])
+    y, x = next((y, r.find('S')) for y, r in enumerate(grid) if 'S' in r)
+
+    beams = Counter({x: 1})
+    splits = set()
+
+    for row in range(y + 1, height):
+        next_beams = Counter()
+
+        for x, count in beams.items():
+            if grid[row][x] == '^':
+                splits.add((row, x))
+                next_beams[x - 1] += count
+                next_beams[x + 1] += count
+
+            else:
+                next_beams[x] += count
+
+        beams = Counter({x: c for x, c in next_beams.items() if 0 <= x < width})
+
+    return len(splits), sum(beams.values())
