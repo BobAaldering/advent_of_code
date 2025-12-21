@@ -1,5 +1,8 @@
 import operator
 import re
+import numpy as np
+import networkx as nx
+from scipy.spatial.distance import pdist
 from functools import reduce
 from itertools import accumulate, pairwise, product, groupby
 from collections import Counter
@@ -37,6 +40,7 @@ def day_2(filename: str) -> tuple[int, int]:
 
                     if a <= n <= b:
                         results.append(n)
+                        
         return results
 
     part_1 = sum(set(n for a, b in ranges for n in _repeated_numbers_in_range(a, b, 2)))
@@ -155,3 +159,42 @@ def day_7(filename: str) -> tuple[int, int]:
         beams = Counter({x: c for x, c in next_beams.items() if 0 <= x < width})
 
     return len(splits), sum(beams.values())
+
+
+def day_8(filename: str) -> tuple[int, int]:
+    points = np.array([list(map(int, line.split(','))) for line in open(filename) if line.strip()])
+    num_points = len(points)
+
+    i_indices, j_indices = np.triu_indices(num_points, 1)
+    sorted_edge_indices = np.argsort(pdist(points))
+
+    graph_part_1 = nx.Graph()
+    graph_part_1.add_nodes_from(range(num_points))
+
+    limit = 1000 if num_points > 20 else 10
+
+    for idx in sorted_edge_indices[:limit]:
+        graph_part_1.add_edge(i_indices[idx], j_indices[idx])
+
+    component_sizes = sorted([len(c) for c in nx.connected_components(graph_part_1)], reverse=True)
+
+    part_1 = int(np.prod(component_sizes[:3]))
+
+    graph_part_2 = nx.utils.UnionFind(range(num_points))
+    num_components = num_points
+    last_edge = (0, 0)
+
+    for idx in sorted_edge_indices:
+        u, v = i_indices[idx], j_indices[idx]
+
+        if graph_part_2[u] != graph_part_2[v]:
+            graph_part_2.union(u, v)
+            num_components -= 1
+
+            if num_components == 1:
+                last_edge = (u, v)
+                break
+
+    part_2 = int(points[last_edge[0], 0] * points[last_edge[1], 0])
+
+    return part_1, part_2
