@@ -3,7 +3,7 @@ import re
 import numpy as np
 import networkx as nx
 from scipy.spatial.distance import pdist
-from functools import reduce
+from functools import reduce, cache
 from itertools import accumulate, pairwise, product, groupby
 from collections import Counter
 
@@ -139,7 +139,7 @@ def day_6(filename: str) -> tuple[int, int]:
 def day_7(filename: str) -> tuple[int, int]:
     grid = open(filename).read().splitlines()
     height, width = len(grid), len(grid[0])
-    y, x = next((y, r.find('S')) for y, r in enumerate(grid) if 'S' in r)
+    y, x = next((y, r.find("S")) for y, r in enumerate(grid) if "S" in r)
 
     beams = Counter({x: 1})
     splits = set()
@@ -148,7 +148,7 @@ def day_7(filename: str) -> tuple[int, int]:
         next_beams = Counter()
 
         for x, count in beams.items():
-            if grid[row][x] == '^':
+            if grid[row][x] == "^":
                 splits.add((row, x))
                 next_beams[x - 1] += count
                 next_beams[x + 1] += count
@@ -158,11 +158,14 @@ def day_7(filename: str) -> tuple[int, int]:
 
         beams = Counter({x: c for x, c in next_beams.items() if 0 <= x < width})
 
-    return len(splits), sum(beams.values())
+    part_1 = len(splits)
+    part_2 = sum(beams.values())
+
+    return part_1, part_2
 
 
 def day_8(filename: str) -> tuple[int, int]:
-    points = np.array([list(map(int, line.split(','))) for line in open(filename) if line.strip()])
+    points = np.array([list(map(int, line.split(","))) for line in open(filename) if line.strip()])
     num_points = len(points)
 
     i_indices, j_indices = np.triu_indices(num_points, 1)
@@ -196,5 +199,33 @@ def day_8(filename: str) -> tuple[int, int]:
                 break
 
     part_2 = int(points[last_edge[0], 0] * points[last_edge[1], 0])
+
+    return part_1, part_2
+
+
+def day_9(filename: str) -> tuple[int, int]:
+    points = [tuple(map(int, line.split(","))) for line in open(filename) if line.strip()]
+
+    part_1 = max((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1) for (x1, y1), (x2, y2) in product(points, repeat=2))
+
+    return part_1, 0
+
+
+def day_11(filename: str) -> tuple[int, int]:
+    data = [re.findall(r"\w+", line) for line in open(filename) if line.strip()]
+    graph = {nodes[0]: nodes[1:] for nodes in data}
+
+    @cache
+    def _count_paths(start, end):
+        if start == end:
+            return 1
+
+        return sum(_count_paths(neighbor, end) for neighbor in graph.get(start, []))
+
+    def _count_sequence(sequence):
+        return reduce(operator.mul, (_count_paths(u, v) for u, v in pairwise(sequence)), 1)
+
+    part_1 = _count_paths("you", "out")
+    part_2 = _count_sequence(["svr", "fft", "dac", "out"]) + _count_sequence(["svr", "dac", "fft", "out"])
 
     return part_1, part_2
