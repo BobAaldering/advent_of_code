@@ -204,11 +204,68 @@ def day_8(filename: str) -> tuple[int, int]:
 
 
 def day_9(filename: str) -> tuple[int, int]:
-    points = [tuple(map(int, line.split(","))) for line in open(filename) if line.strip()]
+    p = np.array([l.split(",") for l in open(filename) if l.strip()], int)
+    xs, ys = sorted(set(p[:, 0])), sorted(set(p[:, 1]))
+    xm, ym = {x: i for i, x in enumerate(xs)}, {y: j for j, y in enumerate(ys)}
+    m, k = len(xs), len(ys)
 
-    part_1 = max((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1) for (x1, y1), (x2, y2) in product(points, repeat=2))
+    grid = np.zeros((m - 1, k - 1), int)
+    for (x1, y1), (x2, y2) in pairwise(np.vstack([p, p[0]])):
+        if y1 == y2:
+            i1, i2 = sorted([xm[x1], xm[x2]])
+            grid[i1:i2, :ym[y1]] ^= 1
 
-    return part_1, 0
+    pref = np.zeros((m, k), int)
+    pref[1:, 1:] = np.cumsum(np.cumsum(grid, 0), 1)
+
+    ix, iy = np.array([xm[x] for x in p[:, 0]]), np.array([ym[y] for y in p[:, 1]])
+    dx, dy = np.abs(p[:, None, 0] - p[None, :, 0]) + 1, np.abs(p[:, None, 1] - p[None, :, 1]) + 1
+    areas = dx * dy
+
+    i1, i2 = np.minimum(ix[:, None], ix[None, :]), np.maximum(ix[:, None], ix[None, :])
+    j1, j2 = np.minimum(iy[:, None], iy[None, :]), np.maximum(iy[:, None], iy[None, :])
+
+    mask = (i1 < i2) & (j1 < j2)
+    valid = np.zeros_like(mask)
+    valid[mask] = (pref[i2[mask], j2[mask]] - pref[i1[mask], j2[mask]] - pref[i2[mask], j1[mask]] + pref[i1[mask], j1[mask]]) == (i2[mask] - i1[mask]) * (j2[mask] - j1[mask])
+
+    hv = np.zeros((m - 1, k), bool)
+    hv[:, 1:] |= grid.astype(bool); hv[:, :-1] |= grid.astype(bool)
+    h_pref = np.cumsum(np.vstack([np.zeros(k), hv]), 0)
+
+    mask = (i1 < i2) & (j1 == j2)
+    valid[mask] = (h_pref[i2[mask], iy[np.where(mask)[0]]] - h_pref[i1[mask], iy[np.where(mask)[0]]]) == (i2[mask] - i1[mask])
+
+    vv = np.zeros((m, k - 1), bool)
+    vv[1:, :] |= grid.astype(bool); vv[:-1, :] |= grid.astype(bool)
+    v_pref = np.cumsum(np.hstack([np.zeros((m, 1)), vv]), 1)
+
+    mask = (i1 == i2) & (j1 < j2)
+    valid[mask] = (v_pref[ix[np.where(mask)[0]], j2[mask]] - v_pref[ix[np.where(mask)[0]], j1[mask]]) == (j2[mask] - j1[mask])
+
+    valid[(i1 == i2) & (j1 == j2)] = True
+
+    part_1 = areas.max()
+    part_2 = np.max(areas, where=valid, initial=0)
+
+    return part_1, part_2
+
+
+def day_10(filename: str) -> tuple[int, int]:
+    def _solve_button_presses(line):
+        target = sum(1 << i for i, c in enumerate(re.search(r"\[(.*?)]", line)[1]) if c == "#")
+        buttons = [sum(1 << int(x) for x in b.split(",")) for b in re.findall(r"\(([\d,]+)\)", line)]
+        q, visited, d = {0}, {0}, 0
+
+        while q and target not in q:
+            q, visited, d = {c ^ b for c in q for b in buttons} - visited, visited | q, d + 1
+
+        return d if target in q else 0
+
+    part_1 = sum(_solve_button_presses(line) for line in open(filename) if line.strip())
+    part_2 = 0
+
+    return part_1, part_2
 
 
 def day_11(filename: str) -> tuple[int, int]:
